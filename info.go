@@ -16,7 +16,7 @@ type Info struct {
 	AccountId    string          `json:"account_id,omitempty"`   // account id with provider
 	Architecture string          `json:"architecture,omitempty"` // x86_64
 	PublicIP     []net.IP        `json:"public_ip,omitempty"`
-	PrivateIP    []net.IP        `json:"public_ip,omitempty"`
+	PrivateIP    []net.IP        `json:"private_ip,omitempty"`
 	Hostname     string          `json:"hostname,omitempty"`
 	Image        string          `json:"image,omitempty"`
 	ID           string          `json:"id,omitempty"`
