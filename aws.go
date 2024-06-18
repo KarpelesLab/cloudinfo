@@ -107,10 +107,10 @@ func (a *awsProvider) getIdentity() error {
 	a.info.ID = info.InstanceId
 	a.info.Type = info.InstanceType
 	if ip := net.ParseIP(info.PrivateIp); ip != nil {
-		a.info.PrivateIP = append(a.info.PrivateIP, ip)
+		a.info.addPrivateIP(ip)
 	}
 	if ip := net.ParseIP(info.PublicIp); ip != nil {
-		a.info.PublicIP = append(a.info.PublicIP, ip)
+		a.info.addPublicIP(ip)
 	}
 
 	a.info.Location = []*InfoLocation{

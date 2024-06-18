@@ -17,7 +17,7 @@ type DMI struct {
 
 func ReadDMI() (*DMI, error) {
 	var err error
-	var dmi *DMI
+	dmi := &DMI{}
 
 	dmi.Vendor, err = readDMI("sys_vendor")
 	if err != nil {

@@ -68,11 +68,11 @@ func (g *gcpProvider) Fetch() (*Info, error) {
 
 	for _, intf := range info.NetworkInterfaces {
 		if ip := net.ParseIP(intf.IP); ip != nil {
-			g.info.PrivateIP = append(g.info.PrivateIP, ip)
+			g.info.addPrivateIP(ip)
 		}
 		for _, ac := range intf.AccessConfigs {
 			if ip := net.ParseIP(ac.ExternalIP); ip != nil {
-				g.info.PublicIP = append(g.info.PublicIP, ip)
+				g.info.addPublicIP(ip)
 			}
 		}
 	}

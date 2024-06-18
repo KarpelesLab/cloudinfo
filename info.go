@@ -37,6 +37,23 @@ func LoadInfo() (*Info, error) {
 	if h, err := os.Hostname(); err == nil {
 		info.Hostname = h
 	}
+	iflist, _ := net.Interfaces()
+	for _, intf := range iflist {
+		addrs, _ := intf.Addrs()
+		for _, addr := range addrs {
+			switch a := addr.(type) {
+			case *net.IPNet:
+				if a.IP.IsLoopback() {
+					break
+				}
+				if a.IP.IsPrivate() || a.IP.IsLinkLocalUnicast() {
+					info.addPrivateIP(a.IP)
+					break
+				}
+				info.addPublicIP(a.IP)
+			}
+		}
+	}
 	cache := newCachedHttp()
 
 	switch dmi.Cloud {
@@ -49,4 +66,22 @@ func LoadInfo() (*Info, error) {
 	default:
 		return info, fmt.Errorf("unsupported cloud provider %s", dmi.Cloud)
 	}
+}
+
+func (i *Info) addPrivateIP(ip net.IP) {
+	for _, prev := range i.PrivateIP {
+		if prev.Equal(ip) {
+			return
+		}
+	}
+	i.PrivateIP = append(i.PrivateIP, ip)
+}
+
+func (i *Info) addPublicIP(ip net.IP) {
+	for _, prev := range i.PublicIP {
+		if prev.Equal(ip) {
+			return
+		}
+	}
+	i.PublicIP = append(i.PublicIP, ip)
 }
