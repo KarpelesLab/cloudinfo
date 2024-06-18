@@ -11,7 +11,6 @@ type awsProvider struct {
 	cache *cachedHttp
 	info  *Info
 	token string
-	err   error
 }
 
 type awsIdentity struct {
@@ -47,11 +46,11 @@ func (a *awsProvider) Fetch() (*Info, error) {
 
 	err := a.getToken()
 	if err != nil {
-		return nil, err
+		return a.info, err
 	}
 	err = a.getIdentity()
 	if err != nil {
-		return nil, err
+		return a.info, err
 	}
 
 	return a.info, nil

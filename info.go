@@ -3,6 +3,7 @@ package cloudinfo
 import (
 	"fmt"
 	"net"
+	"os"
 )
 
 type InfoLocation struct {
@@ -28,12 +29,22 @@ type Info struct {
 // returned containing some basic information.
 func LoadInfo() (*Info, error) {
 	dmi, _ := ReadDMI()
-	info := &Info{Provider: dmi.Cloud, DMI: dmi}
+	info := &Info{
+		Architecture: getArch(),
+		Provider:     dmi.Cloud,
+		DMI:          dmi,
+	}
+	if h, err := os.Hostname(); err == nil {
+		info.Hostname = h
+	}
 	cache := newCachedHttp()
 
 	switch dmi.Cloud {
 	case "aws":
 		p := &awsProvider{info: info, cache: cache}
+		return p.Fetch()
+	case "gcp":
+		p := &gcpProvider{cache: cache, info: info}
 		return p.Fetch()
 	default:
 		return info, fmt.Errorf("unsupported cloud provider %s", dmi.Cloud)
