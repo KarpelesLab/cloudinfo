@@ -39,7 +39,7 @@ func (a *awsProvider) Name() string {
 	return "aws"
 }
 
-func (a *awsProvider) Fetch() error {
+func (a *awsProvider) Fetch() (*Info, error) {
 	// initialize a.res
 	if a.info == nil {
 		a.info = &Info{}
@@ -47,14 +47,14 @@ func (a *awsProvider) Fetch() error {
 
 	err := a.getToken()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = a.getIdentity()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return a.info, nil
 }
 
 // getToken fetches an api token from the aws server and stores it into a.token

@@ -8,11 +8,11 @@ import (
 
 // DMI can be used to find various information about the machine
 type DMI struct {
-	Cloud           string
-	Vendor          string
-	Product         string
-	BoardAssetTag   string
-	ChassisAssetTag string
+	Cloud           string `json:"cloud"`
+	Vendor          string `json:"sys_vendor"`
+	Product         string `json:"product_name"`
+	BoardAssetTag   string `json:"board_asset_tag"`
+	ChassisAssetTag string `json:"chassis_asset_tag"`
 }
 
 func ReadDMI() (*DMI, error) {
