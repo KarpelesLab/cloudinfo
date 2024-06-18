@@ -27,9 +27,12 @@ type awsIdentity struct {
 	// "kernelId" : null,
 	// "pendingTime" : "2021-10-17T13:39:07Z",
 	PrivateIp string `json:"privateIp"`
+	PublicIp  string `json:"-"`
 	// "ramdiskId" : null,
 	Region  string `json:"region"`  // ap-northeast-1
 	Version string `json:"version"` // 2017-09-30
+
+	Hostname string `json:"-"`
 }
 
 func (a *awsProvider) Name() string {
@@ -75,7 +78,7 @@ func (a *awsProvider) getToken() error {
 
 func (a *awsProvider) getMeta(p string) (string, error) {
 	res, _, err := a.cache.GetWithHeaders("http://169.254.169.254/latest/meta-data/"+p, map[string]string{"X-aws-ec2-metadata-token": a.token})
-	return string(res), err
+	return strings.TrimSpace(string(res)), err
 }
 
 func (a *awsProvider) getIdentity() error {
@@ -89,7 +92,16 @@ func (a *awsProvider) getIdentity() error {
 		return err
 	}
 
+	// let's try to fill any missing info from the identity
+	a.fill(&info.Hostname, "hostname")
+	a.fill(&info.InstanceType, "instance-type")
+	a.fill(&info.AvailabilityZone, "placement/availability-zone")
+	a.fill(&info.Region, "placement/region")
+	a.fill(&info.PublicIp, "public-ipv4")
+	a.fill(&info.PrivateIp, "local-ipv4")
+
 	// fill a.info with the info here
+	a.info.Hostname = info.Hostname
 	a.info.AccountId = info.AccountId
 	a.info.Architecture = info.Architecture
 	a.info.Image = info.ImageId
@@ -97,6 +109,9 @@ func (a *awsProvider) getIdentity() error {
 	a.info.Type = info.InstanceType
 	if ip := net.ParseIP(info.PrivateIp); ip != nil {
 		a.info.PrivateIP = append(a.info.PrivateIP, ip)
+	}
+	if ip := net.ParseIP(info.PublicIp); ip != nil {
+		a.info.PublicIP = append(a.info.PublicIP, ip)
 	}
 
 	a.info.Location = []*InfoLocation{
@@ -106,4 +121,15 @@ func (a *awsProvider) getIdentity() error {
 	}
 
 	return nil
+}
+
+func (a *awsProvider) fill(s *string, field string) error {
+	if *s != "" {
+		// already got the data
+		return nil
+	}
+
+	var err error
+	*s, err = a.getMeta(field)
+	return err
 }
