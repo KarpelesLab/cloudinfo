@@ -8,7 +8,7 @@ import (
 )
 
 func TestInfo(t *testing.T) {
-	nfo, _ := cloudinfo.LoadInfo()
+	nfo, _ := cloudinfo.Load()
 
 	log.Printf("info = %+v", nfo)
 }

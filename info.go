@@ -27,7 +27,7 @@ type Info struct {
 
 // LoadInfo will load & return the info for the current machine. Even if an error happens, a Info structure will be
 // returned containing some basic information.
-func LoadInfo() (*Info, error) {
+func Load() (*Info, error) {
 	dmi, _ := ReadDMI()
 	info := &Info{
 		Architecture: getArch(),
