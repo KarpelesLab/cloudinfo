@@ -2,6 +2,7 @@ package cloudinfo
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"sync"
@@ -118,6 +119,11 @@ func (r *cachedRequest) Do() ([]byte, *http.Response, error) {
 
 		r.resp = resp
 		r.body = dat
+
+		// set r.err if status code isn't 200
+		if resp.StatusCode != 200 {
+			r.err = fmt.Errorf("HTTP Status: %s", resp.Status)
+		}
 	})
 
 	return r.body, r.resp, r.err
