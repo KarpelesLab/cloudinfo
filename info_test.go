@@ -35,6 +35,10 @@ func TestInfo(t *testing.T) {
 		},
 	}
 	log.Printf("info = %s", asJson(nfo))
+
+	if nfo.Location.String() != "cloud=test,zone=testzone" {
+		t.Errorf("invalid location string: %s", nfo.Location)
+	}
 }
 
 func asJson(o any) []byte {
