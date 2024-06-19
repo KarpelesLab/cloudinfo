@@ -11,6 +11,7 @@ type DMI struct {
 	Cloud           string `json:"cloud"`
 	Vendor          string `json:"sys_vendor,omitempty"`
 	ProductName     string `json:"product_name,omitempty"`
+	ProductUUID     string `json:"product_uuid,omitempty"`
 	ProductVersion  string `json:"product_version,omitempty"`
 	BoardAssetTag   string `json:"board_asset_tag,omitempty"`
 	ChassisAssetTag string `json:"chassis_asset_tag,omitempty"`
@@ -24,6 +25,7 @@ func ReadDMI() (*DMI, error) {
 	dmi.ChassisAssetTag = readDMI("chassis_asset_tag") // "Amazon EC2" on aws, nothing on google
 	// product_name on aws: m5a.large on google: Google Compute Engine
 	dmi.ProductName = readDMI("product_name")
+	dmi.ProductUUID = readDMI("product_uuid")
 	dmi.ProductVersion = readDMI("product_version")
 
 	switch strings.ToLower(dmi.Vendor) {

@@ -110,6 +110,8 @@ func (a *awsProvider) getIdentity() error {
 
 	a.info.Location = makeLocation("cloud", "aws", "region", info.Region, "zone", info.AvailabilityZone)
 
+	a.info.fix()
+
 	return nil
 }
 

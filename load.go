@@ -3,8 +3,6 @@ package cloudinfo
 import (
 	"errors"
 	"fmt"
-	"net"
-	"os"
 	"sync"
 	"time"
 )
@@ -52,35 +50,10 @@ func getInfoCache() (*Info, error) {
 }
 
 func realLoad() (*Info, error) {
-	dmi, _ := ReadDMI()
-	info := &Info{
-		Architecture: getArch(),
-		Provider:     dmi.Cloud,
-		DMI:          dmi,
-	}
-	if h, err := os.Hostname(); err == nil {
-		info.Hostname = h
-	}
-	iflist, _ := net.Interfaces()
-	for _, intf := range iflist {
-		addrs, _ := intf.Addrs()
-		for _, addr := range addrs {
-			switch a := addr.(type) {
-			case *net.IPNet:
-				if a.IP.IsLoopback() {
-					break
-				}
-				if a.IP.IsPrivate() || a.IP.IsLinkLocalUnicast() {
-					info.PrivateIP.addIP(a.IP)
-					break
-				}
-				info.PublicIP.addIP(a.IP)
-			}
-		}
-	}
+	info := sysinfo()
 	cache := newCachedHttp()
 
-	switch dmi.Cloud {
+	switch info.DMI.Cloud {
 	case "aws":
 		p := &awsProvider{info: info, cache: cache}
 		return p.Fetch()
@@ -88,9 +61,11 @@ func realLoad() (*Info, error) {
 		p := &gcpProvider{cache: cache, info: info}
 		return p.Fetch()
 	case "scaleway":
-		info.Type = dmi.ProductName
+		info.Type = info.DMI.ProductName
+		info.fix()
 		return info, errors.New("scaleway has no API for full machine information")
 	default:
-		return info, fmt.Errorf("unsupported cloud provider %s", dmi.Cloud)
+		info.fix()
+		return info, fmt.Errorf("unsupported cloud provider %s", info.DMI.Cloud)
 	}
 }

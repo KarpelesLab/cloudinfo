@@ -80,5 +80,7 @@ func (g *gcpProvider) Fetch() (*Info, error) {
 
 	g.info.Location = makeLocation("cloud", "gcp", "region", region, "zone", zone)
 
+	g.info.fix()
+
 	return g.info, nil
 }
