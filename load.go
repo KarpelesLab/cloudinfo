@@ -1,6 +1,7 @@
 package cloudinfo
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -86,6 +87,9 @@ func realLoad() (*Info, error) {
 	case "gcp":
 		p := &gcpProvider{cache: cache, info: info}
 		return p.Fetch()
+	case "scaleway":
+		info.Type = dmi.ProductName
+		return info, errors.New("scaleway has no API for full machine information")
 	default:
 		return info, fmt.Errorf("unsupported cloud provider %s", dmi.Cloud)
 	}

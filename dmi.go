@@ -26,12 +26,14 @@ func ReadDMI() (*DMI, error) {
 	dmi.ProductName = readDMI("product_name")
 	dmi.ProductVersion = readDMI("product_version")
 
-	switch dmi.Vendor {
-	case "Amazon EC2":
+	switch strings.ToLower(dmi.Vendor) {
+	case "amazon ec2":
 		dmi.Cloud = "aws"
-	case "Google":
+	case "google":
 		dmi.Cloud = "gcp"
-	case "Xen":
+	case "scaleway":
+		dmi.Cloud = "scaleway"
+	case "xen":
 		// ProductVersion = 4.11.amazon
 		if strings.Contains(dmi.ProductVersion, "amazon") {
 			dmi.Cloud = "aws"
