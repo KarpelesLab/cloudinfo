@@ -2,7 +2,7 @@ package cloudinfo
 
 import "runtime"
 
-func getArch() string {
+func getArchFallback() string {
 	v := runtime.GOARCH
 
 	switch v {
