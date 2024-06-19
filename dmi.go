@@ -49,5 +49,11 @@ func readDMI(name string) string {
 	if err != nil {
 		return ""
 	}
-	return strings.TrimSpace(string(res))
+	resStr := strings.TrimSpace(string(res))
+	switch resStr {
+	case "To be filled by O.E.M.", "Default string":
+		return ""
+	default:
+		return resStr
+	}
 }
