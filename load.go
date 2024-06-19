@@ -4,11 +4,33 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
 )
 
-// LoadInfo will load & return the info for the current machine. Even if an error happens, a Info structure will be
+var (
+	infoCache *Info
+	infoLock  sync.Mutex
+)
+
+// Load will load & return the info for the current machine. Even if an error happens, a Info structure will be
 // returned containing some basic information.
+// If no error is returned the info will be cached and the same Info object will be returned for each subsequent call
 func Load() (*Info, error) {
+	infoLock.Lock()
+	defer infoLock.Unlock()
+
+	if infoCache != nil {
+		return infoCache, nil
+	}
+
+	info, err := realLoad()
+	if err == nil {
+		infoCache = info
+	}
+	return info, err
+}
+
+func realLoad() (*Info, error) {
 	dmi, _ := ReadDMI()
 	info := &Info{
 		Architecture: getArch(),
