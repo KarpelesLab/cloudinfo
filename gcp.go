@@ -2,7 +2,6 @@ package cloudinfo
 
 import (
 	"encoding/json"
-	"net"
 	"path"
 	"strconv"
 	"strings"
@@ -67,13 +66,9 @@ func (g *gcpProvider) Fetch() (*Info, error) {
 	}
 
 	for _, intf := range info.NetworkInterfaces {
-		if ip := net.ParseIP(intf.IP); ip != nil {
-			g.info.addPrivateIP(ip)
-		}
+		g.info.PrivateIP.addString(intf.IP)
 		for _, ac := range intf.AccessConfigs {
-			if ip := net.ParseIP(ac.ExternalIP); ip != nil {
-				g.info.addPublicIP(ip)
-			}
+			g.info.PublicIP.addString(ac.ExternalIP)
 		}
 	}
 

@@ -3,7 +3,6 @@ package cloudinfo
 import (
 	"encoding/json"
 	"errors"
-	"net"
 	"strings"
 )
 
@@ -106,12 +105,8 @@ func (a *awsProvider) getIdentity() error {
 	a.info.Image = info.ImageId
 	a.info.ID = info.InstanceId
 	a.info.Type = info.InstanceType
-	if ip := net.ParseIP(info.PrivateIp); ip != nil {
-		a.info.addPrivateIP(ip)
-	}
-	if ip := net.ParseIP(info.PublicIp); ip != nil {
-		a.info.addPublicIP(ip)
-	}
+	a.info.PrivateIP.addString(info.PrivateIp)
+	a.info.PublicIP.addString(info.PublicIp)
 
 	a.info.Location = makeLocation("cloud", "aws", "region", info.Region, "zone", info.AvailabilityZone)
 

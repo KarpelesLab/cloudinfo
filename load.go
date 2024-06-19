@@ -70,10 +70,10 @@ func realLoad() (*Info, error) {
 					break
 				}
 				if a.IP.IsPrivate() || a.IP.IsLinkLocalUnicast() {
-					info.addPrivateIP(a.IP)
+					info.PrivateIP.addIP(a.IP)
 					break
 				}
-				info.addPublicIP(a.IP)
+				info.PublicIP.addIP(a.IP)
 			}
 		}
 	}
