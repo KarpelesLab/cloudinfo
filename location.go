@@ -34,3 +34,12 @@ func (la LocationArray) String() string {
 	}
 	return strings.Join(s, ",")
 }
+
+func (la LocationArray) Get(typ string) string {
+	for _, l := range la {
+		if l.Type == typ {
+			return l.Value
+		}
+	}
+	return ""
+}
