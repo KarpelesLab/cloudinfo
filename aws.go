@@ -113,11 +113,7 @@ func (a *awsProvider) getIdentity() error {
 		a.info.addPublicIP(ip)
 	}
 
-	a.info.Location = []*InfoLocation{
-		&InfoLocation{Type: "cloud", Value: "aws"},
-		&InfoLocation{Type: "region", Value: info.Region},
-		&InfoLocation{Type: "zone", Value: info.AvailabilityZone},
-	}
+	a.info.Location = makeLocation("cloud", "aws", "region", info.Region, "zone", info.AvailabilityZone)
 
 	return nil
 }

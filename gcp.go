@@ -83,11 +83,7 @@ func (g *gcpProvider) Fetch() (*Info, error) {
 		region = region[:pos]
 	}
 
-	g.info.Location = []*InfoLocation{
-		&InfoLocation{Type: "cloud", Value: "gcp"},
-		&InfoLocation{Type: "region", Value: region},
-		&InfoLocation{Type: "zone", Value: zone},
-	}
+	g.info.Location = makeLocation("cloud", "gcp", "region", region, "zone", zone)
 
 	return g.info, nil
 }
