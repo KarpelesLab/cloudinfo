@@ -5,29 +5,49 @@ import (
 	"net"
 	"os"
 	"sync"
+	"time"
 )
 
 var (
-	infoCache *Info
-	infoLock  sync.Mutex
+	infoCache  *Info
+	infoErr    error
+	infoExpire time.Time
+	infoLock   sync.RWMutex
 )
 
 // Load will load & return the info for the current machine. Even if an error happens, a Info structure will be
 // returned containing some basic information.
-// If no error is returned the info will be cached and the same Info object will be returned for each subsequent call
 func Load() (*Info, error) {
+	if info, err := getInfoCache(); info != nil {
+		return info, err
+	}
+
 	infoLock.Lock()
 	defer infoLock.Unlock()
 
-	if infoCache != nil {
-		return infoCache, nil
+	if infoCache != nil && time.Until(infoExpire) >= 0 {
+		return infoCache, infoErr
 	}
 
-	info, err := realLoad()
-	if err == nil {
-		infoCache = info
+	infoCache, infoErr = realLoad()
+
+	if infoErr == nil {
+		infoExpire = time.Now().Add(24 * time.Hour)
+	} else {
+		infoExpire = time.Now().Add(time.Hour)
 	}
-	return info, err
+
+	return infoCache, infoErr
+}
+
+func getInfoCache() (*Info, error) {
+	infoLock.RLock()
+	defer infoLock.RUnlock()
+
+	if time.Until(infoExpire) < 0 {
+		return nil, nil
+	}
+	return infoCache, infoErr
 }
 
 func realLoad() (*Info, error) {
