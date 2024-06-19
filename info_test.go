@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"log"
-	"net"
+	"net/netip"
 	"testing"
 
 	"github.com/KarpelesLab/cloudinfo"
@@ -18,8 +18,8 @@ func TestInfo(t *testing.T) {
 		Provider:     "test",
 		AccountId:    "123456",
 		Architecture: "x86_64",
-		PublicIP:     []net.IP{net.ParseIP("1.2.3.4")},
-		PrivateIP:    []net.IP{net.ParseIP("10.0.0.1")},
+		PublicIP:     cloudinfo.IPList{netip.MustParseAddr("1.2.3.4")},
+		PrivateIP:    cloudinfo.IPList{netip.MustParseAddr("10.0.0.1")},
 		Hostname:     "localhost.localdomain",
 		Image:        "image-disk",
 		ID:           "i-1232456",
