@@ -16,9 +16,8 @@ func (l *IPList) addIP(ip net.IP) {
 }
 
 func (l *IPList) addAddr(a netip.Addr) {
-	if a.Is4In6() {
-		a = a.Unmap()
-	}
+	a = a.Unmap()
+
 	for _, i := range *l {
 		if i == a {
 			return
